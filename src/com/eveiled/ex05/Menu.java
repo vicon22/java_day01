@@ -3,7 +3,6 @@ package com.eveiled.ex05;
 import com.eveiled.ex05.transaction.Transaction;
 import com.eveiled.ex05.transactionServise.TransactionsService;
 import com.eveiled.ex05.user.User;
-
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -25,13 +24,14 @@ public class Menu {
     public void devMessage()
     {
         System.out.println(
-                "1. Add a user\n" +
-                "2. View user balances\n" +
-                "3. Perform a transfer\n" +
-                "4. View all transactions for a specific user\n" +
-                "5. DEV - remove a transfer by ID\n" +
-                "6. DEV - check transfer validity\n" +
-                "7. Finish execution"
+                """
+                        1. Add a user
+                        2. View user balances
+                        3. Perform a transfer
+                        4. View all transactions for a specific user
+                        5. DEV - remove a transfer by ID
+                        6. DEV - check transfer validity
+                        7. Finish execution"""
         );
     }
 
@@ -42,31 +42,27 @@ public class Menu {
     public void startDevMode()
     {
         Scanner scanner = new Scanner(System.in);
-        message();
-        int i = scanner.nextInt();
-
-        System.out.println("---------------------------------------------------------");
         devMessage();
-        i = scanner.nextInt();
+        int i = scanner.nextInt();
         while (i != 7)
         {
             if (i == 1) {
-                AddAUser(transactionsService);
+                AddAUser();
             }
             if (i == 2) {
-                UserBalance(transactionsService);
+                UserBalance();
             }
             if (i == 3) {
-                PerformATransfer(transactionsService);
+                PerformATransfer();
             }
             if (i == 4) {
-                AllUsersTransactions(transactionsService);
+                AllUsersTransactions();
             }
             if (i == 5) {
-                RemoveTransfer(transactionsService);
+                RemoveTransfer();
             }
             if (i == 6) {
-                checkTransferValidity(transactionsService);
+                checkTransferValidity();
             }
             System.out.println("---------------------------------------------------------");
             devMessage();
@@ -82,16 +78,16 @@ public class Menu {
         while(true) {
             switch (i) {
                 case (1):
-                    AddAUser(transactionsService);
+                    AddAUser();
                     break;
                 case (2):
-                    UserBalance(transactionsService);
+                    UserBalance();
                     break;
                 case (3):
-                    PerformATransfer(transactionsService);
+                    PerformATransfer();
                     break;
                 case (4):
-                    AllUsersTransactions(transactionsService);
+                    AllUsersTransactions();
                     break;
                 case (5):
                     System.exit(0);
@@ -102,63 +98,112 @@ public class Menu {
         }
     }
 
-    private static void AddAUser(TransactionsService transactionsService) {
+    private void AddAUser() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter a user name and a balance");
-        String name = scanner.next();
-        int balance = scanner.nextInt();
+        System.out.println("Enter user's name and a balance");
+        boolean rewrite = true;
+        String name = null;
+        int balance = 0;
+        while (rewrite) {
+            try {
+                name = scanner.next();
+                balance = scanner.nextInt();
+                rewrite = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Try enter correct user's name and a balance again");
+            }
+        }
         User user = new User(name, balance);
         transactionsService.addUser(user);
         System.out.println("User with id = " + user.getIdentifier() + " is added");
     }
 
-    private static void UserBalance(TransactionsService transactionsService) {
+    private void UserBalance() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a user id");
-        int id = scanner.nextInt();
-        int balance = transactionsService.getUserBalance(id);
+        boolean rewrite = true;
+        int id = 0;
+        int balance = 0;
+        while (rewrite) {
+            try {
+                id = scanner.nextInt();
+                balance = transactionsService.getUserBalance(id);
+                rewrite = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Try enter correct user id again");
+            }
+        }
         System.out.println("User with id = " + id + " have balance with " + balance + " amount");
     }
 
-    private static void PerformATransfer(TransactionsService transactionsService) {
+    private void PerformATransfer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a sender ID, a recipient ID, and a transfer amount");
-        int senderId = scanner.nextInt();
-        int recipientId = scanner.nextInt();
-        int transferAmount = scanner.nextInt();
-        transactionsService.makeTransaction(senderId, recipientId, transferAmount);
+        boolean rewrite = true;
+        int senderId = 0;
+        int recipientId = 0;
+        int transferAmount = 0;
+        while (rewrite) {
+            try {
+                senderId = scanner.nextInt();
+                recipientId = scanner.nextInt();
+                transferAmount = scanner.nextInt();
+                transactionsService.makeTransaction(senderId, recipientId, transferAmount);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Enter correct sender ID, recipient ID and transfer amount");
+            }
         System.out.println("The transfer is completed");
-
+        }
     }
 
-    private static void AllUsersTransactions(TransactionsService transactionsService) {
+    private void AllUsersTransactions() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a user ID");
-        int userId = scanner.nextInt();
-        User user = transactionsService.retrieveUserById(userId);
-        Transaction[] usersTransaction = transactionsService.getUsersTransactions(user);
-        for (Transaction transaction: usersTransaction)
-        {
+        int userId = 0;
+        Transaction[] usersTransaction = null;
+        boolean rewrite = true;
+
+        while (rewrite) {
+            try {
+                userId = scanner.nextInt();
+                User user = transactionsService.retrieveUserById(userId);
+                usersTransaction = transactionsService.getUsersTransactions(user);
+            } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Enter correct user ID");
+                }
+            }
+        for (Transaction transaction: usersTransaction) {
             System.out.println(transaction.getTransactionsInfo());
         }
     }
 
-    private static void RemoveTransfer(TransactionsService transactionsService) {
+    private void RemoveTransfer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a user ID and a transfer ID");
+        boolean rewrite = true;
+        while (rewrite) {
+            try {
         int userId = scanner.nextInt();
         UUID trId = UUID.fromString(scanner.next());
-        System.out.println(trId);
         transactionsService.removeUsersTransaction(userId, trId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Enter a user ID and a transfer I");
+            }
+        }
+        System.out.println("Transfer removed");
     }
 
-    private static void checkTransferValidity(TransactionsService transactionsService) {
+    private void checkTransferValidity() {
         Transaction[] invalidTransactions = transactionsService.getInvalidTransactions();
-        if (invalidTransactions.length != 0 && invalidTransactions[0] != null)
-        {
+        if (invalidTransactions.length != 0 && invalidTransactions[0] != null) {
             System.out.println("notAll transactions are valid " + invalidTransactions.length + " "+ invalidTransactions[0]);
         }
-        else if (invalidTransactions.length == 0){
+        else if (invalidTransactions.length == 0) {
             System.out.println("No one transaction was transferred");
         }
         else {
