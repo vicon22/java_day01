@@ -54,7 +54,6 @@ public class UsersArrayList implements UsersList {
 
         LENGTH_OF_ARRAY = LENGTH_OF_ARRAY * 2;
         expandedArray = new User[LENGTH_OF_ARRAY];
-        //System.arraycopy(array, 0, expandedArray, 0, array.length);
         for (int i = 0; i < array.length; i++) {
             expandedArray[i] = array[i];
         }

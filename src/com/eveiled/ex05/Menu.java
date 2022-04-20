@@ -77,20 +77,11 @@ public class Menu {
         int i = scanner.nextInt();
         while(true) {
             switch (i) {
-                case (1):
-                    AddAUser();
-                    break;
-                case (2):
-                    UserBalance();
-                    break;
-                case (3):
-                    PerformATransfer();
-                    break;
-                case (4):
-                    AllUsersTransactions();
-                    break;
-                case (5):
-                    System.exit(0);
+                case (1) -> AddAUser();
+                case (2) -> UserBalance();
+                case (3) -> PerformATransfer();
+                case (4) -> AllUsersTransactions();
+                case (5) -> System.exit(0);
             }
             System.out.println("---------------------------------------------------------");
             message();
@@ -151,11 +142,12 @@ public class Menu {
                 recipientId = scanner.nextInt();
                 transferAmount = scanner.nextInt();
                 transactionsService.makeTransaction(senderId, recipientId, transferAmount);
+                rewrite = false;
+                System.out.println("The transfer is completed");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Enter correct sender ID, recipient ID and transfer amount");
             }
-        System.out.println("The transfer is completed");
         }
     }
 
@@ -171,13 +163,15 @@ public class Menu {
                 userId = scanner.nextInt();
                 User user = transactionsService.retrieveUserById(userId);
                 usersTransaction = transactionsService.getUsersTransactions(user);
+                rewrite = false;
             } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Enter correct user ID");
                 }
             }
         for (Transaction transaction: usersTransaction) {
-            System.out.println(transaction.getTransactionsInfo());
+            System.out.println("Transfer To " + transaction.getRecipient().getName() + "(id = " + transaction.getRecipient().getIdentifier() + ") " + transaction.getTransferAmount() + " with id = "
+            + transaction.getId());
         }
     }
 
@@ -185,29 +179,52 @@ public class Menu {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a user ID and a transfer ID");
         boolean rewrite = true;
+        Transaction transaction = null;
         while (rewrite) {
             try {
-        int userId = scanner.nextInt();
-        UUID trId = UUID.fromString(scanner.next());
-        transactionsService.removeUsersTransaction(userId, trId);
+                int userId = scanner.nextInt();
+                UUID trId = UUID.fromString(scanner.next());
+                User user = transactionsService.retrieveUserById(userId);
+                Transaction[] transactions = transactionsService.getUsersTransactions(user);
+                for (Transaction tr: transactions) {
+                    if (tr.getId().compareTo(trId) == 0){
+                        transaction = tr;
+                    }
+                }
+                if (transaction == null){
+                    throw new Exception("non-existent transaction ID");
+                }
+                transactionsService.removeUsersTransaction(userId, trId);
+                rewrite = false;
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Enter a user ID and a transfer I");
             }
         }
-        System.out.println("Transfer removed");
+        System.out.println("Transfer To " + transaction.getRecipient().getName() + "(id = " + transaction.getRecipient().getIdentifier() + ") " + transaction.getTransferAmount() + " removed");
     }
 
     private void checkTransferValidity() {
-        Transaction[] invalidTransactions = transactionsService.getInvalidTransactions();
-        if (invalidTransactions.length != 0 && invalidTransactions[0] != null) {
-            System.out.println("notAll transactions are valid " + invalidTransactions.length + " "+ invalidTransactions[0]);
-        }
-        else if (invalidTransactions.length == 0) {
-            System.out.println("No one transaction was transferred");
-        }
-        else {
-            System.out.println("All transactions are valid");
+
+        try {
+            System.out.println("Check results: ");
+            Transaction[] invalidTransactions = transactionsService.getInvalidTransactions();
+            if (invalidTransactions.length != 0 && invalidTransactions[0] != null) {
+                for (Transaction transaction : invalidTransactions) {
+
+                    System.out.println(transaction.getRecipient().getName() + "(id = " + transaction.getRecipient().getIdentifier()
+                            + ") has an unacknowledged transfer id = " + transaction.getId() + " from "
+                            + transaction.getSender().getName()  + "(id = " + transaction.getSender().getIdentifier()
+                            + ") for " + transaction.getTransferAmount());
+                }
+
+            } else if (invalidTransactions.length == 0) {
+                System.out.println("No one transaction was transferred");
+            } else {
+                System.out.println("All transactions are valid");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

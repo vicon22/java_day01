@@ -14,7 +14,6 @@ public class Program {
         System.out.println(tom);
         System.out.println(barbara);
         System.out.println(homelessNick);
-        //==================================================================
         Transaction tr1 = new Transaction(john, tom, 300);
         Transaction tr2 = new Transaction(barbara, tom, 150);
         Transaction tr3 = new Transaction(john, barbara, -350);

@@ -85,7 +85,6 @@ public class TransactionsService {
         }
         correctArray = new Transaction[size];
 
-//        System.arraycopy(invalidTransactions, 0, correctArray, 0, size);
         for (int i = 0; i < size; i++) {
             correctArray[i] = invalidTransactions[i];
         }

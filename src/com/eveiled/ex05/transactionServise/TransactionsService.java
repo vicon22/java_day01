@@ -29,7 +29,7 @@ public class TransactionsService {
         if (transferAmount <= 0){
             throw new IllegalTransactionException("transferAmount has to be positive!");
         }
-        if (usersList.getById(id_recipient).getBalance() < transferAmount){
+        if (usersList.getById(id_sender).getBalance() < transferAmount){
             throw new IllegalTransactionException("transferAmount exceed user’s residual balance!");
         }
         if (id_sender == id_recipient){
@@ -94,7 +94,6 @@ public class TransactionsService {
         }
         correctArray = new Transaction[size];
 
-//        System.arraycopy(invalidTransactions, 0, correctArray, 0, size);
         for (int i = 0; i < size; i++) {
             correctArray[i] = invalidTransactions[i];
         }
